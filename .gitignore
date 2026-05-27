@@ -1,8 +1,64 @@
+# OS
 .DS_Store
+
+# Dependencies
 node_modules
+
+# Build outputs
 dist/
+dist-ssr/
+build/
+
+# Coverage
 coverage
-certs/*
-!certs/.gitkeep
+.nyc_output
+
+# Logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+lerna-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Temp directories
+.temp
+.tmp
+
+# Environment variables
 .env*
 !.env.*example
+*.local
+
+# Certificates
+certs/*
+!certs/.gitkeep
+
+# Data directories
+uploads/*
+!uploads/.gitkeep
+pgadmin_data
+postgres_data
+
+# Generated files
+**/generated
+**/src/generated
+
+# IDE
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
