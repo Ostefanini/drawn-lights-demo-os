@@ -1,4 +1,4 @@
-import * as z from "zod/v4";
+import * as z from "zod";
 import { userNicknameSchema } from "./user.js";
 
 export const soundSchema = z.enum(["healing", "emerveille", "glossy", "none"]);
@@ -8,5 +8,10 @@ export const combinationStatusSchema = z.object({
     foundBy: userNicknameSchema.nullable(),
 });
 
+export const combinationAttributionBodySchema = z.object({
+    userNickname: userNicknameSchema,
+})
+
 export type CombinationStatus = z.infer<typeof combinationStatusSchema>;
+export type CombinationAttributionBody = z.infer<typeof combinationAttributionBodySchema>;
 export type Sound = z.infer<typeof soundSchema>;

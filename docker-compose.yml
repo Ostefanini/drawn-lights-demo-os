@@ -1,16 +1,15 @@
 services:
   migrate:
-    image: ghcr.io/ostefanini/ts-drones/api-migrate:latest
-    command: ["pnpm", "exec", "prisma", "migrate", "deploy"]
+    image: ghcr.io/ostefanini/Drawn-lights-demo-os/prisma-migrate:latest
     env_file:
       - .env
     depends_on:
       postgres:
         condition: service_healthy
 
-  web:
-    image: ghcr.io/ostefanini/ts-drones/web:latest
-    container_name: "web"
+  web-react:
+    image: ghcr.io/ostefanini/Drawn-lights-demo-os/web-react:latest
+    container_name: "web-react"
     group_add:
       - "120"
     volumes:
@@ -20,12 +19,12 @@ services:
     ports:
       - 3002:443
     depends_on:
-      api:
+      api-nestjs:
         condition: service_started
 
-  api:
-    image: ghcr.io/ostefanini/ts-drones/api:latest
-    container_name: "api"
+  api-nestjs:
+    image: ghcr.io/ostefanini/Drawn-lights-demo-os/api-nestjs:latest
+    container_name: "api-nestjs"
     ports:
       - 127.0.0.1:4000:4000
     env_file:
@@ -35,7 +34,6 @@ services:
         condition: service_healthy
       migrate:
         condition: service_completed_successfully
-    command: ["node", "dist/index.js"]
 
   postgres:
     image: postgres:16

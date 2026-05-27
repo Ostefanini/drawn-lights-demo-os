@@ -1,9 +1,9 @@
-import * as z from "zod/v4";
+import * as z from "zod";
 
 export const userNicknameSchema = z.string().min(1).max(30).regex(/^[a-zA-Z0-9_]+$/);
 
 export const userSchema = z.object({
-    id: z.uuid(),
+    id: z.string().uuid(),
     nickname: userNicknameSchema,
 });
 
