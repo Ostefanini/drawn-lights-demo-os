@@ -5,13 +5,13 @@ on:
     branches: [main]
 
 permissions:
-  contents: read
+  contents: write
   packages: write
 
 env:
   REGISTRY: ghcr.io
   OWNER: ostefanini
-  REPO: ts-drones
+  REPO: Drawn-lights-demo-os
 
 jobs:
   ci:
@@ -26,28 +26,44 @@ jobs:
           #cache-dependency-path: pnpm-lock.yaml
 
       - uses: pnpm/action-setup@v4
-        with:
-          version: 9
-          #run_install: false
 
       - run: pnpm -v
       - run: pnpm install --frozen-lockfile
+        env:
+          DATABASE_URL: "postgresql://user:pass@localhost:5432/db?schema=public"
 
-      - run: pnpm -r --filter @ts-drones/shared build
+      - name: Build packages
+        run: |
+          pnpm -C packages/shared build
+          pnpm -C packages/prisma build
 
       - run: node -v
-      - run: pnpm --filter web exec eslint -v
+      - run: pnpm --filter web-react exec eslint -v
 
       - name: Lint (workspace)
         run: pnpm lint
 
-      - name: Prisma generate (api)
-        run: pnpm --filter api exec prisma generate
+      - name: Type check (workspace)
+        run: pnpm typecheck
+
+      - name: Prisma generate
+        run: pnpm --filter @drawn-lights-demo/prisma exec prisma generate --config prisma.config.ts
         env:
           DATABASE_URL: "postgresql://user:pass@localhost:5432/db?schema=public"
 
       - name: Tests (workspace)
         run: pnpm test
+
+      - name: Generate coverage badges
+        run: pnpm test:cov:badges
+
+      - name: Commit coverage badges
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: "apps/*/badges"
+          message: "chore: update coverage badges [skip ci]"
+          default_author: github_actions
+        continue-on-error: true
 
   build_and_push:
     needs: ci
@@ -57,16 +73,20 @@ jobs:
       fail-fast: false
       matrix:
         image:
-          - name: web
-            dockerfile: apps/web/Dockerfile
+          - name: web-react
+            dockerfile: apps/web-react/Dockerfile
             context: .
             target: runtime
-          - name: api
-            dockerfile: apps/api/Dockerfile
+          - name: api-expressjs
+            dockerfile: apps/api-expressjs/Dockerfile
             context: .
             target: runtime
-          - name: api-migrate
-            dockerfile: apps/api/Dockerfile
+          - name: api-nestjs
+            dockerfile: apps/api-nestjs/Dockerfile
+            context: .
+            target: runtime
+          - name: prisma-migrate
+            dockerfile: packages/prisma/Dockerfile
             context: .
             target: migrate
     steps:
@@ -111,7 +131,7 @@ jobs:
       - name: Deploy (SSH -> docker compose)
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ts-drones.drawnlights.show
+          host: drawn-lights-demo.drawnlights.show
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_KEY }}
           port: ${{ secrets.DEPLOY_PORT }}
@@ -119,6 +139,6 @@ jobs:
             set -e
             cd "${{ secrets.DEPLOY_PATH }}"
             git pull
-            docker compose pull
-            docker compose up -d --remove-orphans
+            docker compose pull prisma-migrate web-react api-nestjs
+            docker compose up -d web-react api-nestjs --remove-orphans
             docker image prune -f

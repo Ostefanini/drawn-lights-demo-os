@@ -1,12 +1,31 @@
 {
-    "name": "ts-drones",
+    "name": "drawn-lights-demo",
     "private": true,
     "version": "1.0.0",
     "scripts": {
-        "lint": "pnpm --filter web lint && pnpm --filter api lint",
-        "test": "pnpm --filter web test && pnpm --filter api test"
+        "lint": "pnpm -r --filter './apps/*' lint",
+        "test": "pnpm -r --filter './apps/*' test",
+        "test:cov:badges": "pnpm -r --filter './apps/*' test:cov:badges",
+        "typecheck": "pnpm -r --filter './apps/*' --filter './packages/*' typecheck",
+        "migrate": "pnpm --filter @drawn-lights-demo/prisma migrate:dev",
+        "migrate:deploy": "pnpm --filter @drawn-lights-demo/prisma migrate:deploy",
+        "showDb": "pnpm --filter @drawn-lights-demo/prisma studio",
+        "stack:dev": "docker compose -f docker-compose.dev.yml up -d --wait",
+        "stack:dev:down": "docker compose -f docker-compose.dev.yml down",
+        "stack:tests": "docker compose -f docker-compose.tests.yml up -d --wait",
+        "stack:tests:down": "docker compose -f docker-compose.tests.yml down",
+        "stack:prod:local": "docker compose -f docker-compose.prod.local.yml up -d --wait",
+        "stack:prod:local:down": "docker compose -f docker-compose.prod.local.yml down"
     },
     "devDependencies": {
         "typescript": "^5.9.3"
-    }
+    },
+    "pnpm": {
+        "overrides": {
+            "@types/express": "^4.17.21",
+            "@types/express-serve-static-core": "^4.19.8",
+            "dotenv": "^16.6.1"
+        }
+    },
+    "packageManager": "pnpm@10.25.0+sha512.5e82639027af37cf832061bcc6d639c219634488e0f2baebe785028a793de7b525ffcd3f7ff574f5e9860654e098fe852ba8ac5dd5cefe1767d23a020a92f501"
 }

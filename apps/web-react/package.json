@@ -1,0 +1,50 @@
+{
+  "name": "web",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "typecheck": "tsc -b",
+    "lint": "eslint -v && eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@mantine/core": "^8.3.10",
+    "@mantine/hooks": "^8.3.10",
+    "@mantine/notifications": "^8.3.10",
+    "@tabler/icons-react": "^3.35.0",
+    "@drawn-lights-demo/shared": "workspace:*",
+    "@wavesurfer/react": "^1.0.12",
+    "axios": "^1.13.2",
+    "emoji-blast": "^0.11.0",
+    "i18next": "^25.7.3",
+    "i18next-browser-languagedetector": "^8.2.0",
+    "object-to-formdata": "^4.5.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-fast-marquee": "^1.6.5",
+    "react-github-corner": "^2.5.0",
+    "react-i18next": "^16.5.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/node": "^24.10.1",
+    "@types/react": "^19.2.5",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.1",
+    "eslint": "^9.39.1",
+    "eslint-plugin-react-dom": "^2.3.13",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
+    "eslint-plugin-react-x": "^2.3.13",
+    "globals": "^16.5.0",
+    "postcss": "^8.5.6",
+    "postcss-preset-mantine": "^1.18.0",
+    "postcss-simple-vars": "^7.0.1",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.46.4",
+    "vite": "^7.2.4"
+  }
+}

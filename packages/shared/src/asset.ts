@@ -1,19 +1,24 @@
-import * as z from "zod/v4";
+import * as z from "zod";
 import { tagSchema } from "./tag.js";
 
 export const assetTypeSchema = z.enum(["2d", "3d", "script"]);
 
 export const assetSchema = z.object({
-  id: z.uuid(),
+  id: z.string().uuid(),
   name: z.string().min(1),
-  thumbnail: z.uuid(), // refers to the thumbnail asset id stored separately
-  video: z.url().nullable(),
+  thumbnail: z.string().uuid(), // refers to the thumbnail asset id stored separately
+  video: z.string().url().nullable(),
   description: z.string(),
   type: assetTypeSchema,
-  durationSec: z.number().nonnegative().nullable(),
-  nbUav: z.number().nonnegative().nullable(),
-  tags: z.array(tagSchema).min(1),
-  createdAt: z.iso.datetime(),
+  durationSec: z.coerce.number().nonnegative().nullable(),
+  nbUav: z.coerce.number().nonnegative().nullable(),
+  tags: z.array(tagSchema).min(1).refine(
+    (tags) => new Set(tags).size === tags.length,
+    {
+      message: 'Tags must be unique',
+    },
+  ),
+  createdAt: z.string().datetime(),
 });
 
 // used only at runtime after multer upload, on req.body

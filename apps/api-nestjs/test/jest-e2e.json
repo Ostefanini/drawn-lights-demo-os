@@ -1,0 +1,30 @@
+{
+  "preset": "ts-jest/presets/default-esm",
+  "extensionsToTreatAsEsm": [
+    ".ts"
+  ],
+  "moduleNameMapper": {
+    "^(\\.\\.?\\/.+)\\.js$": "$1"
+  },
+  "transform": {
+    "^.+\\.ts$": [
+      "ts-jest",
+      {
+        "useESM": true
+      }
+    ]
+  },
+  "moduleFileExtensions": [
+    "js",
+    "json",
+    "ts"
+  ],
+  "rootDir": ".",
+  "testEnvironment": "node",
+  "testRegex": ".e2e-spec.ts$",
+  "testTimeout": 30000,
+  "maxWorkers": 1,
+  "setupFilesAfterEnv": [
+    "<rootDir>/jest.setup.cjs"
+  ]
+}

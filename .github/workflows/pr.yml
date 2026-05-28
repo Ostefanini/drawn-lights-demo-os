@@ -1,0 +1,183 @@
+name: CI (Pull Request)
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - uses: pnpm/action-setup@v4
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: echo "pnpm_cache_dir=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - run: pnpm install --frozen-lockfile
+        env:
+          DATABASE_URL: "postgresql://user:pass@localhost:5432/db?schema=public"
+
+      - name: Build packages
+        run: |
+          pnpm -C packages/shared build
+          pnpm -C packages/prisma build
+
+      - name: Cache workspace
+        uses: actions/cache@v4
+        with:
+          path: |
+            .
+            !node_modules
+          key: workspace-${{ github.sha }}
+
+  lint:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - uses: pnpm/action-setup@v4
+
+      - name: Restore workspace
+        uses: actions/cache@v4
+        with:
+          path: |
+            .
+            !node_modules
+          key: workspace-${{ github.sha }}
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: echo "pnpm_cache_dir=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+
+      - run: pnpm install --frozen-lockfile
+        env:
+          DATABASE_URL: "postgresql://user:pass@localhost:5432/db?schema=public"
+
+      - name: Lint
+        run: pnpm lint
+
+  typecheck:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - uses: pnpm/action-setup@v4
+
+      - name: Restore workspace
+        uses: actions/cache@v4
+        with:
+          path: |
+            .
+            !node_modules
+          key: workspace-${{ github.sha }}
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: echo "pnpm_cache_dir=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+
+      - run: pnpm install --frozen-lockfile
+        env:
+          DATABASE_URL: "postgresql://user:pass@localhost:5432/db?schema=public"
+
+      - name: Type check
+        run: pnpm typecheck
+
+  test:
+    needs: setup
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: drawn_lights_demo_test
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+        options: >-
+          --health-cmd "pg_isready -U test_user -d drawn_lights_demo_test"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - uses: pnpm/action-setup@v4
+
+      - name: Restore workspace
+        uses: actions/cache@v4
+        with:
+          path: |
+            .
+            !node_modules
+          key: workspace-${{ github.sha }}
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: echo "pnpm_cache_dir=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+
+      - run: pnpm install --frozen-lockfile
+        env:
+          DATABASE_URL: "postgresql://test_user:test_password@localhost:5432/drawn_lights_demo_test"
+
+      - name: Prisma generate
+        run: pnpm --filter @drawn-lights-demo/prisma exec prisma generate --config prisma.config.ts
+        env:
+          DATABASE_URL: "postgresql://test_user:test_password@localhost:5432/drawn_lights_demo_test"
+
+      - name: Prisma migrate
+        run: pnpm --filter @drawn-lights-demo/prisma exec prisma migrate deploy --config prisma.config.ts
+        env:
+          DATABASE_URL: "postgresql://test_user:test_password@localhost:5432/drawn_lights_demo_test"
+
+      - name: Tests
+        run: pnpm test
+        env:
+          DATABASE_URL: "postgresql://test_user:test_password@localhost:5432/drawn_lights_demo_test"

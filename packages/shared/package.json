@@ -1,11 +1,12 @@
 {
-    "name": "@ts-drones/shared",
+    "name": "@drawn-lights-demo/shared",
     "version": "1.0.0",
     "type": "module",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "scripts": {
-        "build": "tsc"
+        "build": "tsc",
+        "typecheck": "tsc --noEmit"
     },
     "dependencies": {
         "zod": "^3.25.76"
