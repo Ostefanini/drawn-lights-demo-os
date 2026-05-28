@@ -1,6 +1,6 @@
 services:
   migrate:
-    image: ghcr.io/ostefanini/Drawn-lights-demo-os/prisma-migrate:latest
+    image: ghcr.io/ostefanini/drawn-lights-demo-os/prisma-migrate:latest
     env_file:
       - .env
     depends_on:
@@ -8,7 +8,7 @@ services:
         condition: service_healthy
 
   web-react:
-    image: ghcr.io/ostefanini/Drawn-lights-demo-os/web-react:latest
+    image: ghcr.io/ostefanini/drawn-lights-demo-os/web-react:latest
     container_name: "web-react"
     group_add:
       - "120"
@@ -27,7 +27,7 @@ services:
         condition: service_started
 
   api-nestjs:
-    image: ghcr.io/ostefanini/Drawn-lights-demo-os/api-nestjs:latest
+    image: ghcr.io/ostefanini/drawn-lights-demo-os/api-nestjs:latest
     container_name: "api-nestjs"
     ports:
       - 127.0.0.1:4000:4000
