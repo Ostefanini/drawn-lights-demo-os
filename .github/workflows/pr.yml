@@ -9,7 +9,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  ci:
+  setup:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,10 +19,18 @@ jobs:
           node-version: 24
 
       - uses: pnpm/action-setup@v4
-        with:
-          version: 9
 
-      - run: pnpm -v
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: echo "pnpm_cache_dir=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
       - run: pnpm install --frozen-lockfile
 
       - name: Build packages
@@ -30,16 +38,111 @@ jobs:
           pnpm -C packages/shared build
           pnpm -C packages/prisma build
 
-      - name: Lint (workspace)
+      - name: Cache workspace
+        uses: actions/cache@v4
+        with:
+          path: |
+            .
+            !node_modules
+          key: workspace-${{ github.sha }}
+
+  lint:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - uses: pnpm/action-setup@v4
+
+      - name: Restore workspace
+        uses: actions/cache@v4
+        with:
+          path: |
+            .
+            !node_modules
+          key: workspace-${{ github.sha }}
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: echo "pnpm_cache_dir=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Lint
         run: pnpm lint
 
-      - name: Type check (workspace)
+  typecheck:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - uses: pnpm/action-setup@v4
+
+      - name: Restore workspace
+        uses: actions/cache@v4
+        with:
+          path: |
+            .
+            !node_modules
+          key: workspace-${{ github.sha }}
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: echo "pnpm_cache_dir=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Type check
         run: pnpm typecheck
+
+  test:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - uses: pnpm/action-setup@v4
+
+      - name: Restore workspace
+        uses: actions/cache@v4
+        with:
+          path: |
+            .
+            !node_modules
+          key: workspace-${{ github.sha }}
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: echo "pnpm_cache_dir=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+
+      - run: pnpm install --frozen-lockfile
 
       - name: Prisma generate
         run: pnpm --filter @drawn-lights-demo/prisma exec prisma generate --config prisma.config.ts
         env:
           DATABASE_URL: "postgresql://user:pass@localhost:5432/db?schema=public"
 
-      - name: Tests (workspace)
+      - name: Tests
         run: pnpm test
