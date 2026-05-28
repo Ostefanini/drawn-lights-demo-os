@@ -16,8 +16,12 @@ services:
       - /etc/letsencrypt/live/:/certs/live:ro
       - /etc/letsencrypt/archive:/certs/archive:ro
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
-    ports:
-      - 3002:443
+    expose:
+      - "80"
+    networks:
+      public:
+        aliases:
+          - demo-os-web-react
     depends_on:
       api-nestjs:
         condition: service_started
@@ -70,3 +74,6 @@ volumes:
   postgres_data:
   pgadmin_data:
 
+networks:
+  public:
+    external: true
