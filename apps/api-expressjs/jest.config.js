@@ -24,4 +24,13 @@ export default {
 
   coverageDirectory: "./coverage",
   coverageReporters: ["json-summary", "text", "lcov"],
+  collectCoverageFrom: [
+    "src/**/*.ts",
+    "!src/index.ts",
+    "!src/services/db.ts",
+    "!src/services/multer.ts",
+    "!src/generated/**",
+    "!src/helpers/mustGetLocal.ts",
+    "!src/types/**"
+  ],
 };

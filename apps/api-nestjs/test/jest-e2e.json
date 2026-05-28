@@ -19,12 +19,26 @@
     "json",
     "ts"
   ],
-  "rootDir": ".",
+  "rootDir": "..",
   "testEnvironment": "node",
-  "testRegex": ".e2e-spec.ts$",
+  "testRegex": "test/.*\\.e2e-spec\\.ts$",
   "testTimeout": 30000,
   "maxWorkers": 1,
   "setupFilesAfterEnv": [
-    "<rootDir>/jest.setup.cjs"
+    "<rootDir>/test/jest.setup.cjs"
+  ],
+  "collectCoverageFrom": [
+    "src/**/*.(t|j)s",
+    "!src/**/*.spec.ts",
+    "!src/**/*.d.ts",
+    "!src/main.ts",
+    "!src/prisma/prisma.service.ts",
+    "!src/common/filters/http-exception.filter.ts"
+  ],
+  "coverageDirectory": "coverage",
+  "coverageReporters": [
+    "json-summary",
+    "text",
+    "lcov"
   ]
 }
