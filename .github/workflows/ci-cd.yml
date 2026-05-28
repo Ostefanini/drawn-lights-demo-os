@@ -16,6 +16,20 @@ env:
 jobs:
   ci:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: drawn_lights_demo_test
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+        options: >-
+          --health-cmd "pg_isready -U test_user -d drawn_lights_demo_test"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
+        ports:
+          - 5432:5432
     steps:
       - uses: actions/checkout@v4
 
@@ -30,7 +44,7 @@ jobs:
       - run: pnpm -v
       - run: pnpm install --frozen-lockfile
         env:
-          DATABASE_URL: "postgresql://user:pass@localhost:5432/db?schema=public"
+          DATABASE_URL: "postgresql://test_user:test_password@localhost:5432/drawn_lights_demo_test"
 
       - name: Build packages
         run: |
@@ -49,10 +63,17 @@ jobs:
       - name: Prisma generate
         run: pnpm --filter @drawn-lights-demo/prisma exec prisma generate --config prisma.config.ts
         env:
-          DATABASE_URL: "postgresql://user:pass@localhost:5432/db?schema=public"
+          DATABASE_URL: "postgresql://test_user:test_password@localhost:5432/drawn_lights_demo_test"
+
+      - name: Prisma migrate
+        run: pnpm --filter @drawn-lights-demo/prisma exec prisma migrate deploy --config prisma.config.ts
+        env:
+          DATABASE_URL: "postgresql://test_user:test_password@localhost:5432/drawn_lights_demo_test"
 
       - name: Tests (workspace)
         run: pnpm test
+        env:
+          DATABASE_URL: "postgresql://test_user:test_password@localhost:5432/drawn_lights_demo_test"
 
       - name: Generate coverage badges
         run: pnpm test:cov:badges
