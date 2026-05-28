@@ -32,6 +32,8 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - run: pnpm install --frozen-lockfile
+        env:
+          DATABASE_URL: "postgresql://user:pass@localhost:5432/db?schema=public"
 
       - name: Build packages
         run: |
@@ -74,6 +76,8 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
 
       - run: pnpm install --frozen-lockfile
+        env:
+          DATABASE_URL: "postgresql://user:pass@localhost:5432/db?schema=public"
 
       - name: Lint
         run: pnpm lint
@@ -106,6 +110,8 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
 
       - run: pnpm install --frozen-lockfile
+        env:
+          DATABASE_URL: "postgresql://user:pass@localhost:5432/db?schema=public"
 
       - name: Type check
         run: pnpm typecheck
@@ -138,6 +144,8 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
 
       - run: pnpm install --frozen-lockfile
+        env:
+          DATABASE_URL: "postgresql://user:pass@localhost:5432/db?schema=public"
 
       - name: Prisma generate
         run: pnpm --filter @drawn-lights-demo/prisma exec prisma generate --config prisma.config.ts

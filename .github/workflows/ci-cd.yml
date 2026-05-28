@@ -29,6 +29,8 @@ jobs:
 
       - run: pnpm -v
       - run: pnpm install --frozen-lockfile
+        env:
+          DATABASE_URL: "postgresql://user:pass@localhost:5432/db?schema=public"
 
       - name: Build packages
         run: |
