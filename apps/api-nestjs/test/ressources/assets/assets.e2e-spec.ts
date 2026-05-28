@@ -1,6 +1,5 @@
 import { demoPlaystationModels } from '@drawn-lights-demo/shared';
 import { INestApplication } from '@nestjs/common';
-import * as fs from 'fs';
 import * as path from 'path';
 import request from 'supertest';
 import { PrismaTestService } from '../../prisma-test.service.js';
@@ -9,12 +8,7 @@ import { cleanupTestApp, createTestApp } from '../../test-helpers.js';
 describe('AssetsController (e2e)', () => {
   let app: INestApplication;
   let prismaTest: PrismaTestService;
-  const testImagePath = path.join(
-    process.cwd(),
-    'test',
-    'files',
-    'cross.png',
-  );
+  const testImagePath = path.join(process.cwd(), 'test', 'files', 'cross.png');
 
   // Use predefined PlayStation models for valid tests
   const crossModel = demoPlaystationModels[0]; // cross
@@ -84,11 +78,11 @@ describe('AssetsController (e2e)', () => {
       const response = await request(app.getHttpServer())
         .post('/assets')
         .field('name', crossModel.name)
-        .field('video', crossModel.video)
+        .field('video', crossModel.video!)
         .field('description', crossModel.description)
         .field('type', crossModel.type)
-        .field('durationSec', crossModel.durationSec.toString())
-        .field('nbUav', crossModel.nbUav.toString())
+        .field('durationSec', crossModel.durationSec!.toString())
+        .field('nbUav', crossModel.nbUav!.toString())
         .field('tags[]', crossModel.tags[0])
         .attach('thumbnail', testImagePath)
         .expect(201);
@@ -104,11 +98,11 @@ describe('AssetsController (e2e)', () => {
       const response = await request(app.getHttpServer())
         .post('/assets')
         .field('name', triangleModel.name)
-        .field('video', triangleModel.video)
+        .field('video', triangleModel.video!)
         .field('description', triangleModel.description)
         .field('type', triangleModel.type)
-        .field('durationSec', triangleModel.durationSec.toString())
-        .field('nbUav', triangleModel.nbUav.toString())
+        .field('durationSec', triangleModel.durationSec!.toString())
+        .field('nbUav', triangleModel.nbUav!.toString())
         .field('tags[]', triangleModel.tags[0])
         .attach('thumbnail', testImagePath)
         .expect(201);
@@ -120,11 +114,11 @@ describe('AssetsController (e2e)', () => {
       await request(app.getHttpServer())
         .post('/assets')
         .field('name', crossModel.name)
-        .field('video', crossModel.video)
+        .field('video', crossModel.video!)
         .field('description', crossModel.description)
         .field('type', crossModel.type)
-        .field('durationSec', crossModel.durationSec.toString())
-        .field('nbUav', crossModel.nbUav.toString())
+        .field('durationSec', crossModel.durationSec!.toString())
+        .field('nbUav', crossModel.nbUav!.toString())
         .field('tags[]', crossModel.tags[0])
         .expect(400);
     });
@@ -155,11 +149,11 @@ describe('AssetsController (e2e)', () => {
       await request(app.getHttpServer())
         .post('/assets')
         .field('name', crossModel.name)
-        .field('video', crossModel.video)
+        .field('video', crossModel.video!)
         .field('description', crossModel.description)
         .field('type', 'invalid-type')
-        .field('durationSec', crossModel.durationSec.toString())
-        .field('nbUav', crossModel.nbUav.toString())
+        .field('durationSec', crossModel.durationSec!.toString())
+        .field('nbUav', crossModel.nbUav!.toString())
         .field('tags[]', crossModel.tags[0])
         .attach('thumbnail', testImagePath)
         .expect(400);
@@ -169,11 +163,11 @@ describe('AssetsController (e2e)', () => {
       await request(app.getHttpServer())
         .post('/assets')
         .field('name', crossModel.name)
-        .field('video', crossModel.video)
+        .field('video', crossModel.video!)
         .field('description', crossModel.description)
         .field('type', crossModel.type)
         .field('durationSec', '-10')
-        .field('nbUav', crossModel.nbUav.toString())
+        .field('nbUav', crossModel.nbUav!.toString())
         .field('tags[]', crossModel.tags[0])
         .attach('thumbnail', testImagePath)
         .expect(400);
@@ -183,10 +177,10 @@ describe('AssetsController (e2e)', () => {
       await request(app.getHttpServer())
         .post('/assets')
         .field('name', crossModel.name)
-        .field('video', crossModel.video)
+        .field('video', crossModel.video!)
         .field('description', crossModel.description)
         .field('type', crossModel.type)
-        .field('durationSec', crossModel.durationSec.toString())
+        .field('durationSec', crossModel.durationSec!.toString())
         .field('nbUav', '-5')
         .field('tags[]', crossModel.tags[0])
         .attach('thumbnail', testImagePath)
@@ -197,11 +191,11 @@ describe('AssetsController (e2e)', () => {
       await request(app.getHttpServer())
         .post('/assets')
         .field('name', crossModel.name)
-        .field('video', crossModel.video)
+        .field('video', crossModel.video!)
         .field('description', crossModel.description)
         .field('type', crossModel.type)
-        .field('durationSec', crossModel.durationSec.toString())
-        .field('nbUav', crossModel.nbUav.toString())
+        .field('durationSec', crossModel.durationSec!.toString())
+        .field('nbUav', crossModel.nbUav!.toString())
         .field('tags[]', 'duplicate')
         .field('tags[]', 'duplicate')
         .attach('thumbnail', testImagePath)
@@ -215,11 +209,11 @@ describe('AssetsController (e2e)', () => {
       await request(app.getHttpServer())
         .post('/assets')
         .field('name', crossModel.name)
-        .field('video', crossModel.video)
+        .field('video', crossModel.video!)
         .field('description', crossModel.description)
         .field('type', crossModel.type)
-        .field('durationSec', crossModel.durationSec.toString())
-        .field('nbUav', crossModel.nbUav.toString())
+        .field('durationSec', crossModel.durationSec!.toString())
+        .field('nbUav', crossModel.nbUav!.toString())
         .field('tags[]', crossModel.tags[0])
         .attach('thumbnail', largBuffer, 'large.png')
         .expect(400);
@@ -245,11 +239,11 @@ describe('AssetsController (e2e)', () => {
       const createResponse = await request(app.getHttpServer())
         .post('/assets')
         .field('name', crossModel.name)
-        .field('video', crossModel.video)
+        .field('video', crossModel.video!)
         .field('description', crossModel.description)
         .field('type', crossModel.type)
-        .field('durationSec', crossModel.durationSec.toString())
-        .field('nbUav', crossModel.nbUav.toString())
+        .field('durationSec', crossModel.durationSec!.toString())
+        .field('nbUav', crossModel.nbUav!.toString())
         .field('tags[]', crossModel.tags[0])
         .attach('thumbnail', testImagePath)
         .expect(201);
