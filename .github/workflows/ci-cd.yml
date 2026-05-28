@@ -70,13 +70,10 @@ jobs:
         env:
           DATABASE_URL: "postgresql://test_user:test_password@localhost:5432/drawn_lights_demo_test"
 
-      - name: Tests (workspace)
-        run: pnpm test
+      - name: Tests & coverage badges
+        run: pnpm test:cov:badges
         env:
           DATABASE_URL: "postgresql://test_user:test_password@localhost:5432/drawn_lights_demo_test"
-
-      - name: Generate coverage badges
-        run: pnpm test:cov:badges
 
       - name: Commit coverage badges
         uses: EndBug/add-and-commit@v9
