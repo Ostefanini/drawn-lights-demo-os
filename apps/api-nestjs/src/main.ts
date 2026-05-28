@@ -30,6 +30,5 @@ async function bootstrap() {
   await app.listen(port!);
 
   console.log(`📚 Swagger UI available at: http://localhost:${port}/api`);
-  console.log(process.env.NODE_ENV);
 }
 void bootstrap();
