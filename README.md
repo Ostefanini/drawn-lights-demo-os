@@ -127,6 +127,12 @@ pnpm test                 # Run all tests
 pnpm typecheck            # Run all typechecks
 ```
 
+# Contributors
+
+| Name | Role |
+|------|------|
+| Karine | Product Manager |
+
 # Hire me
 
 oscar[dot]stefanini1[at]gmail.com
